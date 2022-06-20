@@ -1,0 +1,6 @@
+Dockerfile
+/.git
+/docker-compose.yml
+/node_modules/
+/vendor/
+/public/hot

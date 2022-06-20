@@ -1,17 +1,27 @@
+---
 version: '3.6'
 services:
     nginx:
-        build: docker/nginx
+        build:
+            context: .
+            target: azuriom-nginx
         restart: always
+        env_file: .env
         ports:
             - "${PORT-80}:80"
-        volumes:
-            - './:/usr/share/nginx/html'
     php-fpm:
-        build: docker/php
+        build:
+            context: .
+            target: azuriom-php
         restart: always
-        volumes:
-            - './:/usr/share/nginx/html'
+        env_file: .env
+        environment:
+            - DB_CONNECTION=pgsql
+            - DB_HOST=database
+            - DB_PORT=5432
+            - DB_DATABASE=azuriom
+            - DB_USERNAME=azuriom
+            - DB_PASSWORD=truc
 
     database:
         image: 'postgres:12'
@@ -20,8 +30,8 @@ services:
             - pgsql-data:/var/lib/postgresql/data
         environment:
             - PGDATA=/var/lib/postgresql/data/pgdata
-            - POSTGRES_DB=${DB_DATABASE}
-            - POSTGRES_USER=${DB_USERNAME}
-            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=azuriom
+            - POSTGRES_USER=azuriom
+            - POSTGRES_PASSWORD=truc
 volumes:
     pgsql-data:
