@@ -30,6 +30,8 @@ RUN docker-php-ext-install intl opcache bcmath
 
 COPY ./docker/php/custom.ini $PHP_INI_DIR/conf.d/
 
+COPY ./docker/php/docker.conf /usr/local/etc/php-fpm.d/docker.conf
+
 WORKDIR /usr/share/nginx/html
 
 COPY --from=node /usr/src/app /usr/share/nginx/html
@@ -37,10 +39,14 @@ COPY --from=node /usr/src/app /usr/share/nginx/html
 RUN php artisan storage:link
 
 RUN chmod -R o+rw storage bootstrap/cache resources/themes plugins
+RUN chmod -R o+rw .
+
+RUN mkdir /var/azuriom
+RUN chown -R www-data:www-data /var/azuriom
 
 RUN php artisan key:generate
 
-CMD php artisan migrate --seed --force && php artisan user:create --admin --name=admin --email=example@example.com --password=changeme ; php-fpm
+CMD sleep 2 && php artisan migrate --seed --force && php artisan user:create --admin --name=admin --email=example@example.com --password=changeme ; php-fpm
 
 
 FROM nginx:1.19-alpine as azuriom-nginx

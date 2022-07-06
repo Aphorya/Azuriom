@@ -2,6 +2,8 @@
 version: '3.6'
 services:
     nginx:
+        depends_on:
+            - php-fpm
         build:
             context: .
             target: azuriom-nginx
@@ -10,11 +12,13 @@ services:
         ports:
             - "${PORT-80}:80"
     php-fpm:
+        depends_on:
+            - database
         build:
             context: .
             target: azuriom-php
         restart: always
-        env_file: .env
+        # env_file: .env
         environment:
             - DB_CONNECTION=pgsql
             - DB_HOST=database
@@ -26,12 +30,12 @@ services:
     database:
         image: 'postgres:12'
         restart: always
-        volumes:
-            - pgsql-data:/var/lib/postgresql/data
+#        volumes:
+#            - pgsql-data:/var/lib/postgresql/data
         environment:
             - PGDATA=/var/lib/postgresql/data/pgdata
             - POSTGRES_DB=azuriom
             - POSTGRES_USER=azuriom
             - POSTGRES_PASSWORD=truc
-volumes:
-    pgsql-data:
+#volumes:
+#    pgsql-data:
